@@ -18,7 +18,7 @@ static void zerobit()
 
 static void onebit()
 {
-	next.byte = next.byte | (1 << (7 - next.bits));
+	next.byte = next.byte | (1 << next.bits);
 	next.bits++;
 }
 
