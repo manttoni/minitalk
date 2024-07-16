@@ -17,15 +17,12 @@ static void send_char(char c, int pid)
 		if (c & 1)
 		{
 			kill(pid, SIGUSR2);
-			while (!confirm)
-				pause();
 		}
 		else
 		{
 			kill(pid, SIGUSR1);
-			while (!confirm)
-				pause();
 		}
+		pause();
 		confirm = 0;
 		c = c >> 1;
 	}

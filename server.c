@@ -27,13 +27,12 @@ static void handler(int sig, siginfo_t *si, void *unused)
 	if (sig == SIGUSR2)
 	{
 		onebit();
-		kill(si->si_pid, SIGUSR2);
 	}
-	if (sig == SIGUSR1)
+	else if (sig == SIGUSR1)
 	{
 		zerobit();
-		kill(si->si_pid, SIGUSR1);
 	}
+	kill(si->si_pid, SIGUSR1);
 	if (next.bits == 8)
 	{
 		next.bits = 0;
