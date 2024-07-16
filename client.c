@@ -22,8 +22,8 @@ static void send_char(char c, int pid)
 		{
 			kill(pid, SIGUSR1);
 		}
-		pause();
-		//usleep(10);
+		while (confirm == 0)
+			usleep(100);
 		confirm = 0;
 		c = c >> 1;
 	}
