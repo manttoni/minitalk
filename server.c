@@ -32,7 +32,6 @@ static void handler(int sig, siginfo_t *si, void *unused)
 	{
 		zerobit();
 	}
-	kill(si->si_pid, SIGUSR1);
 	if (next.bits == 8)
 	{
 		next.bits = 0;
@@ -41,6 +40,7 @@ static void handler(int sig, siginfo_t *si, void *unused)
 			write(1, "\n", 1);
 		next.byte = 0;
 	}
+	kill(si->si_pid, SIGUSR1);
 }
 
 int main(void)

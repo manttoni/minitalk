@@ -23,7 +23,7 @@ static void send_char(char c, int pid)
 			kill(pid, SIGUSR1);
 		}
 		pause();
-		usleep(10);
+		//usleep(10);
 		confirm = 0;
 		c = c >> 1;
 	}
