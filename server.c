@@ -25,7 +25,7 @@ static void onebit()
 	server.bits++;
 }
 
-static void handler(int sig, siginfo_t *si, void *unused)
+static void handler(int sig, siginfo_t *si, void*)
 {
 	//sigprocmask(SIG_BLOCK, &server.set, &server.oldset);
 	if (server.sender_pid == 0)

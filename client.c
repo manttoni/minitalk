@@ -34,6 +34,8 @@ static void send_char(char c, int pid)
 
 int main(int argc, char **argv)
 {
+	if (argc != 3)
+		return (1);
 	confirm = 0;
 	int pid = atoi(argv[1]);
 	char *message = argv[2];
