@@ -5,8 +5,9 @@
 
 typedef struct s
 {
-	unsigned char byte;
-	int bits;
+	unsigned char	byte;
+	int		bits;
+	int		sender_pid;
 } character;
 
 character next;
@@ -24,6 +25,15 @@ static void onebit()
 
 static void handler(int sig, siginfo_t *si, void *unused)
 {
+	sigset_t set;
+	sigset_t oldset;
+
+	sigemptyset(&set);
+	sigaddset(&set, SIGUSR1);
+	sigaddset(&set, SIGUSR2);
+	sigprocmask(SIG_BLOCK, &set, &oldset);
+	if (next.sender_pid != si->si_pid && next.sender_pid != 0)
+		return ;
 	if (sig == SIGUSR2)
 	{
 		onebit();
@@ -41,6 +51,7 @@ static void handler(int sig, siginfo_t *si, void *unused)
 		next.byte = 0;
 	}
 	kill(si->si_pid, SIGUSR1);
+	sigprocmask(SIG_SETMASK, &oldset, NULL);
 }
 
 int main(void)
@@ -53,6 +64,7 @@ int main(void)
 	sa.sa_flags = SA_SIGINFO;
 	next.byte = 0;
 	next.bits = 0;
+	next.sender_pid = 0;
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
 	while(1)

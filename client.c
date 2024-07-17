@@ -12,18 +12,21 @@ static void confirmation()
 
 static void send_char(char c, int pid)
 {
-	for (int i = 0; i < 8; ++i)
+	int	sig;
+	int	bits;
+
+	bits = 8;
+	while (bits-- > 0)
 	{
 		if (c & 1)
-		{
-			kill(pid, SIGUSR2);
-		}
+			sig = SIGUSR2;
 		else
+			sig = SIGUSR1;
+		while (!confirm)
 		{
-			kill(pid, SIGUSR1);
+			kill(pid, sig);
+			usleep(100);
 		}
-		if (!confirm)
-			pause();
 		confirm = 0;
 		c = c >> 1;
 	}
