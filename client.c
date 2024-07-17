@@ -25,7 +25,7 @@ static void send_char(char c, int pid)
 		while (!confirm)
 		{
 			kill(pid, sig);
-			usleep(100);
+			usleep(1000);
 		}
 		confirm = 0;
 		c = c >> 1;
