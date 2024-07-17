@@ -35,22 +35,21 @@ static void handler(int sig, siginfo_t *si, void *unused)
 	if (next.sender_pid != si->si_pid && next.sender_pid != 0)
 		return ;
 	if (sig == SIGUSR2)
-	{
 		onebit();
-	}
 	else if (sig == SIGUSR1)
-	{
 		zerobit();
-	}
+	kill(si->si_pid, SIGUSR1);
 	if (next.bits == 8)
 	{
-		next.bits = 0;
 		write(1, &next.byte, 1);
 		if (next.byte == '\0')
+		{
 			write(1, "\n", 1);
+			next.sender_pid = 0;
+		}
 		next.byte = 0;
+		next.bits = 0;
 	}
-	kill(si->si_pid, SIGUSR1);
 	sigprocmask(SIG_SETMASK, &oldset, NULL);
 }
 
