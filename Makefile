@@ -1,3 +1,3 @@
 all:
-	cc server.c -o server
-	cc client.c -o client
+	cc -Wall -Wextra -Werror server.c -o server
+	cc -Wall -Wextra -Werror client.c -o client
