@@ -27,7 +27,7 @@ static void onebit()
 
 static void handler(int sig, siginfo_t *si, void *unused)
 {
-	sigprocmask(SIG_BLOCK, &server.set, &server.oldset);
+	//sigprocmask(SIG_BLOCK, &server.set, &server.oldset);
 	if (server.sender_pid == 0)
 		server.sender_pid = si->si_pid;
 	if (server.sender_pid != si->si_pid)
@@ -48,24 +48,29 @@ static void handler(int sig, siginfo_t *si, void *unused)
 		server.byte = 0;
 		server.bits = 0;
 	}
-	sigprocmask(SIG_SETMASK, &server.oldset, NULL);
+	//sigprocmask(SIG_SETMASK, &server.oldset, NULL);
+}
+
+static void set_sigaction()
+{
+	struct sigaction sa;
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_sigaction = handler;
+	sa.sa_flags = SA_SIGINFO;
+	sigemptyset(&server.set);
+	sigaddset(&server.set, SIGUSR1);
+	sigaddset(&server.set, SIGUSR2);
+	sa.sa_mask = server.set;
+	sigaction(SIGUSR1, &sa, NULL);
+	sigaction(SIGUSR2, &sa, NULL);
 }
 
 int main(void)
 {
-	struct sigaction sa;
-
-	memset(&sa, 0, sizeof(sa));
-	sa.sa_sigaction = handler;
-	sa.sa_flags = SA_SIGINFO;
+	set_sigaction();
 	server.byte = 0;
 	server.bits = 0;
 	server.sender_pid = 0;
-	sigaction(SIGUSR1, &sa, NULL);
-	sigaction(SIGUSR2, &sa, NULL);
-	sigemptyset(&server.set);
-	sigaddset(&server.set, SIGUSR1);
-	sigaddset(&server.set, SIGUSR2);
 	printf("%d\n", getpid());
 	while(1)
 		pause();
