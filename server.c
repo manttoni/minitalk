@@ -3,71 +3,70 @@
 #include <unistd.h>
 #include <string.h>
 
-typedef struct s
+typedef struct s_server
 {
 	unsigned char	byte;
 	int		bits;
 	int		sender_pid;
-} character;
+	sigset_t	set;
+	sigset_t	oldset;
+} t_server;
 
-character next;
+t_server server;
 
 static void zerobit()
 {
-	next.bits++;
+	server.bits++;
 }
 
 static void onebit()
 {
-	next.byte = next.byte | (1 << next.bits);
-	next.bits++;
+	server.byte = server.byte | (1 << server.bits);
+	server.bits++;
 }
 
 static void handler(int sig, siginfo_t *si, void *unused)
 {
-	sigset_t set;
-	sigset_t oldset;
-
-	if (next.sender_pid == 0)
-		next.sender_pid = si->si_pid;
-	if (next.sender_pid != si->si_pid)
+	sigprocmask(SIG_BLOCK, &server.set, &server.oldset);
+	if (server.sender_pid == 0)
+		server.sender_pid = si->si_pid;
+	if (server.sender_pid != si->si_pid)
 		return ;
-	sigemptyset(&set);
-	sigaddset(&set, SIGUSR1);
-	sigaddset(&set, SIGUSR2);
-	sigprocmask(SIG_BLOCK, &set, &oldset);
 	if (sig == SIGUSR2)
 		onebit();
 	else if (sig == SIGUSR1)
 		zerobit();
-	kill(next.sender_pid, SIGUSR1);
-	if (next.bits == 8)
+	kill(server.sender_pid, SIGUSR1);
+	if (server.bits == 8)
 	{
-		write(1, &next.byte, 1);
-		if (next.byte == '\0')
+		write(1, &server.byte, 1);
+		if (server.byte == '\0')
 		{
 			write(1, "\n", 1);
-			next.sender_pid = 0;
+			server.sender_pid = 0;
 		}
-		next.byte = 0;
-		next.bits = 0;
+		server.byte = 0;
+		server.bits = 0;
 	}
-	sigprocmask(SIG_SETMASK, &oldset, NULL);
+	sigprocmask(SIG_SETMASK, &server.oldset, NULL);
 }
 
 int main(void)
 {
-	int pid = getpid();
-	printf("%d\n", pid);
 	struct sigaction sa;
+
 	memset(&sa, 0, sizeof(sa));
 	sa.sa_sigaction = handler;
 	sa.sa_flags = SA_SIGINFO;
-	next.byte = 0;
-	next.bits = 0;
-	next.sender_pid = 0;
+	server.byte = 0;
+	server.bits = 0;
+	server.sender_pid = 0;
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
+	sigemptyset(&server.set);
+	sigaddset(&server.set, SIGUSR1);
+	sigaddset(&server.set, SIGUSR2);
+	printf("%d\n", getpid());
 	while(1)
 		pause();
 	return 0;
