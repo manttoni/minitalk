@@ -27,7 +27,6 @@ static void onebit()
 
 static void handler(int sig, siginfo_t *si, void*)
 {
-	//sigprocmask(SIG_BLOCK, &server.set, &server.oldset);
 	if (server.sender_pid == 0)
 		server.sender_pid = si->si_pid;
 	if (server.sender_pid != si->si_pid)
@@ -48,7 +47,6 @@ static void handler(int sig, siginfo_t *si, void*)
 		server.byte = 0;
 		server.bits = 0;
 	}
-	//sigprocmask(SIG_SETMASK, &server.oldset, NULL);
 }
 
 static void set_sigaction()
@@ -65,12 +63,17 @@ static void set_sigaction()
 	sigaction(SIGUSR2, &sa, NULL);
 }
 
-int main(void)
+static void init_server()
 {
-	set_sigaction();
 	server.byte = 0;
 	server.bits = 0;
 	server.sender_pid = 0;
+}
+
+int main(void)
+{
+	init_server();
+	set_sigaction();
 	printf("%d\n", getpid());
 	while(1)
 		pause();
