@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-int confirm;
+volatile sig_atomic_t confirm;
 
 static void confirmation()
 {

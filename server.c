@@ -25,8 +25,9 @@ static void onebit()
 	server.bits++;
 }
 
-static void handler(int sig, siginfo_t *si, void*)
+static void handler(int sig, siginfo_t *si, void* unused)
 {
+	(void) unused;
 	if (server.sender_pid == 0)
 		server.sender_pid = si->si_pid;
 	if (server.sender_pid != si->si_pid)
